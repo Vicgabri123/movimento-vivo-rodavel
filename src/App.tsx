@@ -1,4 +1,4 @@
-import { type Dispatch, type ReactNode, type SetStateAction, useMemo, useState } from 'react';
+import { type Dispatch, type ReactNode, type SetStateAction, useEffect, useMemo, useState } from 'react';
 import {
   Activity,
   ArrowRight,
@@ -387,6 +387,12 @@ function InstructorPage() {
   const [planText, setPlanText] = useState('');
   const students = Object.keys(present);
   const presentCount = Object.values(present).filter(Boolean).length;
+
+  useEffect(() => {
+    if (planEditing) {
+      document.querySelector('[data-testid="panel-exercise-options"]')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+  }, [planEditing]);
   return (
     <main className="mx-auto max-w-[1180px] px-5 py-8 md:px-10 md:py-12">
       <PageHeading eyebrow="Visão do instrutor" title="Bom dia, Rafael" description="Aqui está o pulso da sua próxima aula. Pequenos ajustes fazem uma grande diferença." action={<div className="flex items-center gap-2 rounded-xl border border-border bg-card px-3 py-2.5 text-xs font-bold shadow-sm"><span className="h-2 w-2 rounded-full bg-[hsl(var(--primary))]" /> Aula em 42 min</div>} />
