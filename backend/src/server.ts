@@ -13,7 +13,7 @@ app.use(express.json());
 
 // Endpoint de verificação de saúde da API
 app.get('/api/healthz', (req, res) => {
-  res.json({ status: 'ok', service: 'MoveLinda API' });
+  res.json({ status: 'ok', service: 'MOVLINDA API' });
 });
 
 // Exemplo de rota de aulas protegida por papel
@@ -25,5 +25,5 @@ app.get('/api/classes', (req, res) => {
 });
 
 app.listen(PORT, () => {
-  console.log(`🚀 Servidor MoveLinda rodando na porta ${PORT}`);
+  console.log(`Servidor MOVLINDA rodando na porta ${PORT}`);
 });
