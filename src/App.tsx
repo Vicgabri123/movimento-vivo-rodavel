@@ -130,7 +130,11 @@ function LogoMark() {
   return (
     <div className="flex items-center gap-3" data-testid="brand-movlinda">
       <div className="relative flex h-10 w-10 items-center justify-center rounded-[14px] bg-[hsl(var(--sidebar-primary))] text-[hsl(var(--sidebar-primary-foreground))] shadow-sm">
-        <Activity size={21} strokeWidth={2.5} />
+        <img
+          src={`${import.meta.env.BASE_URL}Movlinda.png`}
+          alt="MOVLINDA"
+          className="h-10 w-10 rounded-[14px] object-cover"
+        />
         <span className="absolute -bottom-1 -right-1 h-3 w-3 rounded-full border-2 border-[hsl(var(--sidebar))] bg-[hsl(var(--accent))]" />
       </div>
       <div className="leading-none">
