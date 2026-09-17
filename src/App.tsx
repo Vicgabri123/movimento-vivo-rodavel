@@ -378,6 +378,13 @@ function InstructorPage() {
   const [planEditing, setPlanEditing] = useState(false);
   const [addedExercises, setAddedExercises] = useState<string[]>([]);
   const exerciseOptions = ['Caminhada lateral', 'Elevação de braços', 'Alongamento de panturrilha', 'Transferência de peso', 'Respiração coordenada'];
+  const [customExercises, setCustomExercises] = useState<string[]>([]);
+  const [newExercise, setNewExercise] = useState('');
+  const [editingExercise, setEditingExercise] = useState<string | null>(null);
+  const [exerciseDraft, setExerciseDraft] = useState('');
+  const [exerciseMaterials, setExerciseMaterials] = useState<Record<string, string[]>>({});
+  const [materialDrafts, setMaterialDrafts] = useState<Record<string, string>>({});
+  const [planText, setPlanText] = useState('');
   const students = Object.keys(present);
   const presentCount = Object.values(present).filter(Boolean).length;
   return (
@@ -408,6 +415,23 @@ function InstructorPage() {
           <div className="mb-2 text-[10px] font-bold uppercase tracking-[.12em] text-muted-foreground">Adicionados ao plano</div>
           <div className="space-y-2">{addedExercises.map((exercise) => <div key={exercise} className="flex items-center justify-between rounded-xl bg-[hsl(var(--muted)/.65)] px-3 py-2.5 text-xs font-semibold"><span>{exercise}</span><button className="rounded-md p-1 text-muted-foreground hover:bg-card" onClick={() => setAddedExercises((current) => current.filter((item) => item !== exercise))} aria-label={`Remover ${exercise}`} data-testid={`button-remove-exercise-${exercise.toLowerCase().replaceAll(' ', '-')}`}><X size={14} /></button></div>)}</div>
         </div>}
+        <div className="mt-5 border-t border-border pt-4" data-testid="exercise-crud">
+          <div className="text-[10px] font-bold uppercase tracking-[.12em] text-muted-foreground">Gerenciar exercícios</div>
+          <div className="mt-3 flex gap-2">
+            <input value={newExercise} onChange={(event) => setNewExercise(event.target.value)} placeholder="Nome do novo exercício" className="min-w-0 flex-1 rounded-xl border border-border bg-background px-3 py-2.5 text-xs outline-none focus:border-[hsl(var(--primary))]" data-testid="input-new-exercise" />
+            <button className="inline-flex items-center gap-1.5 rounded-xl bg-[hsl(var(--primary))] px-3 py-2 text-xs font-bold text-[hsl(var(--primary-foreground))] disabled:opacity-45" disabled={!newExercise.trim()} onClick={() => { const title = newExercise.trim(); setCustomExercises((current) => [...current, title]); setAddedExercises((current) => [...current, title]); setNewExercise(''); }} data-testid="button-create-exercise"><Plus size={14} /> Criar</button>
+          </div>
+          <div className="mt-3 space-y-3">{customExercises.map((exercise) => <div key={exercise} className="rounded-xl border border-border p-3" data-testid={`crud-exercise-${exercise.toLowerCase().replaceAll(' ', '-')}`}>
+            <div className="flex items-center gap-2"><span className="min-w-0 flex-1 text-xs font-bold">{editingExercise === exercise ? <input autoFocus value={exerciseDraft} onChange={(event) => setExerciseDraft(event.target.value)} className="w-full rounded-lg border border-border bg-background px-2 py-1.5 outline-none" /> : exercise}</span>{editingExercise === exercise ? <button className="text-xs font-bold text-[hsl(var(--primary))]" onClick={() => { const title = exerciseDraft.trim(); if (!title) return; setCustomExercises((current) => current.map((item) => item === exercise ? title : item)); setAddedExercises((current) => current.map((item) => item === exercise ? title : item)); setExerciseMaterials((current) => ({ ...current, [title]: current[exercise] ?? [] })); setEditingExercise(null); }} data-testid="button-save-exercise">Salvar</button> : <button className="rounded-md p-1 text-muted-foreground hover:bg-muted" onClick={() => { setEditingExercise(exercise); setExerciseDraft(exercise); }} aria-label={`Editar ${exercise}`} data-testid="button-edit-exercise"><MoreHorizontal size={15} /></button>}<button className="rounded-md p-1 text-muted-foreground hover:bg-muted" onClick={() => { setCustomExercises((current) => current.filter((item) => item !== exercise)); setAddedExercises((current) => current.filter((item) => item !== exercise)); }} aria-label={`Excluir ${exercise}`} data-testid="button-delete-exercise"><X size={15} /></button></div>
+            <div className="mt-3 flex gap-2"><input value={materialDrafts[exercise] ?? ''} onChange={(event) => setMaterialDrafts((current) => ({ ...current, [exercise]: event.target.value }))} placeholder="Adicionar material ou link" className="min-w-0 flex-1 rounded-lg border border-border bg-background px-2.5 py-2 text-[11px] outline-none focus:border-[hsl(var(--primary))]" data-testid="input-exercise-material" /><button className="rounded-lg border border-border px-2.5 text-[11px] font-bold hover:bg-muted" disabled={!(materialDrafts[exercise] ?? '').trim()} onClick={() => { const material = (materialDrafts[exercise] ?? '').trim(); setExerciseMaterials((current) => ({ ...current, [exercise]: [...(current[exercise] ?? []), material] })); setMaterialDrafts((current) => ({ ...current, [exercise]: '' })); }} data-testid="button-add-material">Adicionar</button></div>
+            {(exerciseMaterials[exercise] ?? []).length > 0 && <div className="mt-2 space-y-1">{(exerciseMaterials[exercise] ?? []).map((material) => <div key={material} className="flex items-center justify-between gap-2 rounded-lg bg-[hsl(var(--muted)/.65)] px-2.5 py-2 text-[11px]"><span className="truncate">{material}</span><button className="shrink-0 text-muted-foreground hover:text-foreground" onClick={() => setExerciseMaterials((current) => ({ ...current, [exercise]: (current[exercise] ?? []).filter((item) => item !== material) }))} aria-label={`Remover material ${material}`} data-testid="button-remove-material"><X size={13} /></button></div>)}</div>}
+          </div>)}</div>
+        </div>
+        <div className="mt-5 border-t border-border pt-4" data-testid="today-plan-editor">
+          <div className="text-[10px] font-bold uppercase tracking-[.12em] text-muted-foreground">Plano de hoje</div>
+          <textarea value={planText} onChange={(event) => setPlanText(event.target.value)} placeholder="Escreva orientações, séries, repetições ou observações para a aula..." rows={4} className="mt-3 w-full resize-y rounded-xl border border-border bg-background p-3 text-xs leading-5 outline-none focus:border-[hsl(var(--primary))]" data-testid="input-today-plan" />
+          <div className="mt-2 text-right text-[11px] text-muted-foreground">{planText ? 'Plano salvo nesta sessão' : 'Nenhum plano escrito ainda'}</div>
+        </div>
       </section>}
     </main>
   );
